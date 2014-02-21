@@ -1,0 +1,15 @@
+#Simplify shapefile w/ iteration
+
+require(maptools)
+
+#Load Minnesota shapefile
+state=readShapeSpatial(file.choose(),proj4string=CRS("+proj=longlat +datum=WGS84"))
+plot(state)
+
+#show number of vertices in polygons
+verts <- lapply(mn@polygons, function(x) sapply(x@Polygons, function(y) nrow(y@coords)))
+quantile(unlist(verts))
+
+#show area of polygons
+area <- lapply(mn@polygons, function(x) sapply(x@Polygons, function(y) y@area))
+quantile(unlist(area))

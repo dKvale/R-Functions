@@ -1,4 +1,4 @@
-#Objective: Simplify shapefile w/ iteration, reduce polygons to 11 vertices
+#Objective: Simplify shapefile w/ iteration, reduce polygons to 11 vertices or less
 
 require(maptools)
 

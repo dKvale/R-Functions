@@ -26,7 +26,7 @@ mn=state
 min_tolerance=.0002
 min_area= min(unlist(area))*.05
 
-for(number in 1:25) {
+for(number in 1:20) {
    cat("1000") 
    for(i in 1:4109) {
         if(sapply(mn@polygons[[i]]@Polygons[1], function(y) nrow(y@coords)) >11) {

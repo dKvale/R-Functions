@@ -1,6 +1,7 @@
 #Define outliers for boxplots using ggplot
 require("reshape2")
 require("ggplot2")
+require("scales")
 
 setwd("M:/MNRiskS 2008 Results/ID top pollutants")
 topcopc = read.csv("Inhalation risks by pollutant highest risk pollutants all receptors.csv", header=T, stringsAsFactors=F)
@@ -26,11 +27,24 @@ Outliers.fun <- function(x) {  subset(x, x < quantile(x,.01) | x > quantile(x,.9
 
 #Function to find quantiles for boxplot, 1%,  25%, 50%, 75%, 99% 
 Quants.fun  <- function(x)
-{
-  quants  <- quantile(x,  probs = c(0.01, 0.25, 0.5, 0.75, 0.99))
+{ quants  <- quantile(x,  probs = c(0.01, 0.25, 0.5, 0.75, 0.99))
   names(quants) <- c("ymin", "lower", "middle", "upper", "ymax")
-  quants
-}
+  quants}
+
+#Make boxplots using default
+##Hazard
+boxes <- lapply(levels(factor(reorder(HI_copc$Copc, -HI_copc$value, median))), function(x) Quants.fun(subset(HI_copc, Copc==x)$value) )
+outs  <- lapply(levels(factor(reorder(HI_copc$Copc, -HI_copc$value, median))), function(x) Outliers.fun(subset(HI_copc, Copc==x)$value) )
+par(mar=c(8,4,2,2))
+boxplot(boxes, log='y',col = cm.colors(15), las=2, range=0, ylim=c(1e-10,9), names = levels(factor(reorder(HI_copc$Copc, -HI_copc$value, median))))
+for(x in 1:length(outs)) points(rep(x,length(outs[[x]])), cex=.9, as.numeric(outs[[x]]), col = alpha("black",.25))
+
+##Cancer
+boxes <- lapply(levels(factor(reorder(Canc_copc$Copc, -Canc_copc$value, median))), function(x) Quants.fun(subset(Canc_copc, Copc==x)$value) )
+outs  <- lapply(levels(factor(reorder(Canc_copc$Copc, -Canc_copc$value, median))), function(x) Outliers.fun(subset(Canc_copc, Copc==x)$value) )
+boxplot(boxes, log='y',col = rainbow(15), las=2, range=0, ylim=c(8e-12,.008), names = levels(factor(reorder(Canc_copc$Copc, -Canc_copc$value, median))))
+for(x in 1:length(outs)) points(rep(x,length(outs[[x]])), cex=.9, as.numeric(outs[[x]]), col = alpha("black",.25))
+
 
 #Make boxplots with ggplot2, order pollutants by median, set vertical x-axis, set to log scale
 risk_pal = cm.colors(15)

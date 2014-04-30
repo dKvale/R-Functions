@@ -1,6 +1,6 @@
 #Define outliers for boxplots using ggplot
 require("reshape2")
-require(“ggplot2”)
+require("ggplot2")
 
 setwd("M:/MNRiskS 2008 Results/ID top pollutants")
 topcopc = read.csv("Inhalation risks by pollutant highest risk pollutants all receptors.csv", header=T, stringsAsFactors=F)
@@ -33,10 +33,12 @@ Quants.fun  <- function(x)
 }
 
 #Make boxplots with ggplot2, order pollutants by median, set vertical x-axis, set to log scale
+risk_pal = cm.colors(15)
 ggplot(HI_copc, aes(x = reorder(Copc, -value, median), y= value, fill=Copc)) +
     stat_summary(fun.data=Quants.fun, geom="boxplot") + 
     stat_summary(fun.y = Outliers.fun, geom="point") + 
     scale_y_log10() + 
+    scale_fill_manual(values=risk_pal, limits=levels(factor(reorder(HI_copc$Copc, -HI_copc$value, median))) ) + 
     labs(x="COPC", y="Hazard index across all receptors", title = "Hazard Index Distributions in MnRisk") +
     theme_bw() + theme(axis.text.x = element_text(size =13, angle = 45, hjust=1, vjust=1))
 

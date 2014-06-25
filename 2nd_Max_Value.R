@@ -1,7 +1,7 @@
-# get_n_max() function finds the nth Max value for each group in a data frame
+# get_n_max() function finds the nth Max value for each group in a data frame 
 # and adds the results to the table as a new column named "high_n" 
 
-# nth Max function, where n is the nth max or nth high value
+#where n is the nth max or nth high value
 get_n_max <- function(data = dataTable, results = "result", groups = "groupid", n = 2)
 {
   library(dplyr)
@@ -14,7 +14,7 @@ get_n_max <- function(data = dataTable, results = "result", groups = "groupid", 
   return(data)
 }
 
-# Example, find 2nd Max mpg value for all "cyl" groups in mtcars data
+# Example: find 2nd Max mpg value for all "cyl" groups in mtcars data
 data <- mtcars
 data <- get_n_max(data, results = "mpg", groups = "cyl", 2)
 head(data)
@@ -26,11 +26,10 @@ head(data)
 #5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2   18.7
 
 
-## Create short summary table of results -------------------------------------
+#-------------- Create short summary table of results ---------------
 
 # summary_n_max() function finds the nth Max value for each group in a data frame
 # and produces a summary table
-
 summary_n_max <- function(data = dataTable, results = "result", groups = "groupid", n = 2)
 {
   library(dplyr)
@@ -42,7 +41,7 @@ summary_n_max <- function(data = dataTable, results = "result", groups = "groupi
   return(data)
 }
 
-# Summary of 2nd Max mpg value for all "cyl" groups in mtcars data
+# Example: Summary table of 2nd Max mpg value for all "cyl" groups in mtcars data
 data <- mtcars
 data_2nd_max <- summary_n_max(data, "mpg", "cyl", 2)
 head(data_2nd_max)

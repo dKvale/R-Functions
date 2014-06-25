@@ -1,0 +1,19 @@
+# Function finds the nth Max value for all groups in a data frame
+# Adds the results as a column named "high_n" 
+
+# nth Max Function, where n is the nth max or nth high value you want to retrieve
+get_n_max <- function(data = dataTable, results = "result", groups = "groupid", n = 2)
+{
+  library(dplyr)
+  
+  names(data)[c(grep(results,names(data)), grep(groups,names(data)))] <- c("result", "groupid")
+  data <- group_by(data, groupid) %.% mutate(high_n = sort(result, decreasing=T)[n])
+  names(data)[c(grep("result",names(data)), grep("groupid",names(data)), grep("high_n",names(data)))] <- 
+       c(results, groups, paste("high_", n, sep=""))
+  
+  return(data)
+}
+
+# Find 2nd Max mpg value for all "cyl" groups in mtcars data
+data <- mtcars
+data <- get_n_max(data, results = "mpg", groups = "cyl", 2)

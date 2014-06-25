@@ -35,12 +35,13 @@ bootStrap <- function(   data = dataTable, results = "result", censored = "censo
                  n    <- nrow(subGroup_table)
 # Print % done to screen
     cat(round(count/nGroups*100),"%", sep="")
-    bootstrap_Results <- data.frame()
-    bootstrap_Results2 <- data.frame()
     
 # Break into two groups to inrease speed
     repeats1 <- repeats/2
     repeats2 <- repeats - repeats1
+    bootstrap_Results <- data.frame()
+    bootstrap_Results2 <- data.frame()
+    
     for (i in 1:repeats1){
              bootedMean  <- data.frame(groupID=group, bootMeans=censNada(subGroup_table$result, subGroup_table$censored, sample(1:n, replace=T)))
       bootstrap_Results  <- rbind(bootstrap_Results, bootedMean)

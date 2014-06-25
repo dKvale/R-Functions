@@ -26,7 +26,7 @@ head(data)
 #5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2   18.7
 
 
-## Create summary table of results -------------------------------------
+## Create short summary table of results -------------------------------------
 
 # summary_n_max() function finds the nth Max value for each group in a data frame
 # and produces a summary table

@@ -1,7 +1,7 @@
-# Function finds the nth Max value for all groups in a data frame
-# Adds the results as a column named "high_n" 
+# Function finds the nth Max value for each group in a data frame
+# and adds the results as a new column named "high_n" 
 
-# nth Max Function, where n is the nth max or nth high value you want to retrieve
+# nth Max Function, where n is the nth max or nth high value
 get_n_max <- function(data = dataTable, results = "result", groups = "groupid", n = 2)
 {
   library(dplyr)

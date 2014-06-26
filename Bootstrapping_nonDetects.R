@@ -1,17 +1,14 @@
 ###   Bootstrapping the LCL and UCL for each group in a data frame  ### 
 ###   with Non-detects or censored data                             ###
 
+# Example: 
+
 # The bootStrap_NADA() function takes a censored column containing 0's for detects and 1's for non-detects,
 # or alternatively, TRUE for non-detected and FALSE for detected 
-bootStrap_NADA <- function(   data = dataTable, results = "result", censored = "censored",
-                       groups = "groupID", repeats = 2000, percentile = 0.95){
+boot_NADA <- function(data = dataTable, results = "result", censored = "censored",
+                           groups = "groupID", repeats = 2000, percentile = 0.95){
   library(NADA)
   library(dplyr)
-    
-# start stopwatch
-  start   <- proc.time()
-  count   <- 0
-  
 # Remove unnecessary columns to speed up repetitions
   data <- data[,c(results, groups, censored)]
 
@@ -32,48 +29,55 @@ bootStrap_NADA <- function(   data = dataTable, results = "result", censored = "
 
 # Get alpha in decimal form, default = 95% = 0.95
   alpha <- (1-percentile)
-
+  
+# start stopwatch
+  start   <- proc.time()
+  count   <- 0
+  
 # Suppress repeated warnings
   options(warn = -1)
-  
-# Create empty tables to store results
-  bootedMean        <- data.frame()
+
+# Initiate final summary table
   bootstrap_Summary <- data.frame()
-   
-# Break into two groups to inrease speed    
-    repeats1 <- round(repeats/2)
-    repeats2 <- repeats - repeats1
-    bootstrap_Results <- data.frame()
-    bootstrap_Results2 <- data.frame()
 
-cat("Repetition: ")
-
+# Start bootstrapping one group at a time to limit table size
+for (group in unique(data$groupID)){
+  subGroup_table <- filter(data, groupID == group)
+  n <- nrow(subGroup_table)
+  
+  # Print % done to screen
+  nGroups <- length(unique(data$groupID))
+  cat(round(count/nGroups*100),"%", sep="")
+  
+  # Break into two groups to inrease speed    
+  repeats1          <- repeats/2
+  repeats2          <- repeats - repeats1
+  bootedMeans       <- c()
+  bootedMeans2      <- c()
+  bootstrap_Results <- data.frame()
+  
   for (i in 1:repeats1){
-    bootedMean <- group_by(data, groupID) %.% summarize(bootMeans = as.numeric(mean(cenfit(result[sample(1:length(result), replace=T)], censored))[1]))
-    bootstrap_Results  <- rbind_list(bootstrap_Results, bootedMean)
-    count <- count + 1
-    cat(count, ",", sep="")
-} 
-
+    bootedMeans <- c(bootedMeans, as.numeric(mean(cenfit(subGroup_table$result[sample(1:n, replace=T)], subGroup_table$censored))[1]))
+  } 
   for (i in 1:repeats2){
-    bootedMean <- group_by(data, groupID) %.% summarize(bootMeans = as.numeric(mean(cenfit(result[sample(1:length(result), replace=T)], censored))[1]))
-    bootstrap_Results2  <- rbind_list(bootstrap_Results2, bootedMean)
-    count <- count + 1
-    cat(count, ",", sep="")
+    bootedMeans2 <- c(bootedMeans2, as.numeric(mean(cenfit(subGroup_table$result[sample(1:n, replace=T)], subGroup_table$censored))[1]))
+  }
+  bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(c(bootedMeans,bootedMeans2)))
+  bootstrap_Results <- summarize(bootstrap_Results, groupID = groupID[1], boot_LCL = quantile(bootMeans, probs= alpha, na.rm=T), boot_Mean= mean(bootMeans) , boot_UCL= quantile(bootMeans, probs=percentile, na.rm=T), boot_StDev= sd(bootMeans))
+  bootstrap_Summary <- rbind_list(bootstrap_Summary, bootstrap_Results)
+  
+  count <- count + 1
+  cat("\b\b\b\b")
 }
+# Bring back original groups column name
+names(bootstrap_Summary)[1]  <- c(groups)
+row.names(bootstrap_Summary) <- NULL 
 
-  bootstrap_Results <- rbind_list(bootstrap_Results,bootstrap_Results2)
-  bootstrap_Summary<- group_by(bootstrap_Results, groupID) %.% summarize(boot_LCL = quantile(bootMeans, probs= alpha, na.rm=T), boot_Mean= mean(bootMeans) , boot_UCL= quantile(bootMeans, probs=percentile, na.rm=T), b_StDev= sd(bootMeans))
+# Turn warnings back on
+options(warn=1)
 
-  # Bring back original groups column name
-  names(bootstrap_Summary)[1]  <- c(groups)
-  row.names(bootstrap_Summary) <- NULL 
-  
-  # Turn warnings back on
-  options(warn=1)
-  
-  # Show time elapsed
-  print(proc.time() - start)
-  print(head(bootstrap_Summary))
-  return(bootstrap_Summary)   
+# Show time elapsed
+print(proc.time() - start)
+print(head(bootstrap_Summary))
+return(bootstrap_Summary)   
 }

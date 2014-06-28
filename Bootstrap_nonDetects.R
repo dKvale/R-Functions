@@ -74,7 +74,7 @@ boot_NADA <- function(data = dataTable, results = "result", censored = "censored
   # Remove factor from groupID
   data$groupID <- as.character(data$groupID)
   
-  # Get alpha in decimal form, default = 95% = 0.95
+  # Get alpha from percentil, default is 1 - .95 = 0.05
   alpha <- (1-percentile)
   
   # Start stopwatch

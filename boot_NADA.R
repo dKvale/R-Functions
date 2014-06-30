@@ -1,10 +1,10 @@
 ###-----------------------------------------------------------------------------------###
 #
-#     File:     Bootstrap_nonDetects.R
+#     File:     boot_NADA.R
 #  
 #     Purpose:  Using the NADA and dplyr package, the function below Bootstraps 
 #               the 5% LCL and 95% UCL of the Kaplan-Meier mean for each group or
-#               pollutant in a data frame containing non-detected or censored data         
+#               pollutant in a data frame that contains non-detected or censored data         
 #                                          
 ###-----------------------------------------------------------------------------------###
 

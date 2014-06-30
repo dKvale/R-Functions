@@ -1,6 +1,6 @@
 ###-----------------------------------------------------------------------------------###
 #
-#     File:     boot_NADA.R
+#     File:     bootNADA.R
 #  
 #     Purpose:  Using the NADA and dplyr package, the function below Bootstraps 
 #               the 5% LCL and 95% UCL of the Kaplan-Meier mean for each group or
@@ -47,7 +47,7 @@ head(ozone_Booted)
 
 # The boot_NADA() function takes a censored column containing 0's for detects and 1's for
 # non-detects, or alternatively FALSE for detects and TRUE for non-detects
-boot_NADA <- function(data = dataTable, results = "result", censored = "censored", groups = "groupID", repeats = 2000, percentile = 0.95){
+bootNADA <- function(data = dataTable, results = "result", censored = "censored", groups = "groupID", repeats = 2000, percentile = 0.95){
   
   library(NADA)
   library(dplyr)

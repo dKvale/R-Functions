@@ -94,7 +94,7 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
   for (group in unique(data$groupID)){
     
     subGroup_table <- filter(data, groupID == group)
-    data$groupID <- as.character(data$groupID)
+    subGroup_table$groupID <- as.character(subGroup_table$groupID)
     n <- nrow(subGroup_table)
     
     # Print % done to screen
@@ -104,7 +104,7 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
     bootstrap_Results <- data.frame()
     
     # Define function to record cenfit mean of re-sampled table
-    getCenMean <- function(){
+    getCenMean <- function(x){
           random.rows <- sample(1:n, replace=T)
           mean(cenfit(subGroup_table$result[random.rows], subGroup_table$censored[random.rows]))[1]
 }

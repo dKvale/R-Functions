@@ -106,14 +106,14 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
     # Define function to record cenfit mean of re-sampled table
     getCenMean <- function(x){
           random.rows <- sample(1:n, replace=T)
-          mean(cenfit(subGroup_table$result[random.rows], subGroup_table$censored[random.rows]))[1]
+          mean(cenfit(subGroup_table$result[random.rows], subGroup_table$censored[random.rows]))[[1]]
 }
 
     # Use Lapply to repeat Cenfit from NADA package and bootstrap the mean of the censured data
     bootedMeans <- lapply(1:repeats, FUN = getCenMean)
     
     # Summarize the booted Cenfit means: LCL, UCL, Mean, and Std. Dev
-    bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(bootedMeans))
+    bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(bootedMeans, use.names=FALSE))
     bootstrap_Results <- summarize(bootstrap_Results, groupID = groupID[1], 
                                     boot_LCL = quantile(bootMeans, probs= alpha, na.rm=T),
                                     boot_Mean= mean(bootMeans), 

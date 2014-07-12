@@ -113,12 +113,12 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
     bootedMeans <- lapply(1:repeats, FUN = getCenMean)
     
     # Summarize the booted Cenfit means: LCL, UCL, Mean, and Std. Dev
-    bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(bootedMeans, use.names=FALSE))
+    bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(bootedMeans, use.names=F))
     bootstrap_Results <- summarize(bootstrap_Results, groupID = groupID[1], 
-                                    boot_LCL = quantile(bootMeans, probs= alpha, na.rm=T),
-                                    boot_Mean= mean(bootMeans), 
-                                    boot_UCL= quantile(bootMeans, probs=percentile, na.rm=T),
-                                    boot_StDev= sd(bootMeans))
+                                    boot_LCL   = quantile(bootMeans, probs= alpha, na.rm=T),
+                                    boot_Mean  = mean(bootMeans), 
+                                    boot_UCL   = quantile(bootMeans, probs=percentile, na.rm=T),
+                                    boot_StDev = sd(bootMeans))
     bootstrap_Summary <- rbind(bootstrap_Summary, bootstrap_Results)
     
     count <- count + 1

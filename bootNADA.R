@@ -81,6 +81,9 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
   start <- proc.time()
   count <- 0
   
+  #Count groups for progress counting
+  nGroups <- length(unique(data$groupID))
+      
   # Suppress repeated warnings
   options(warn = -1)
   
@@ -95,14 +98,13 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
     n <- nrow(subGroup_table)
     
     # Print % done to screen
-    nGroups <- length(unique(data$groupID))
     cat(ceiling(count/nGroups*100),"% ", sep="")
     
     # Initiate final summary table
     bootstrap_Results <- data.frame()
     
     # Define function to record cenfit mean of re-sampled table
-    getCenMean <- function(x=6){
+    getCenMean <- function(){
           random.rows <- sample(1:n, replace=T)
           mean(cenfit(subGroup_table$result[random.rows], subGroup_table$censored[random.rows]))[1]
 }
@@ -112,7 +114,11 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
     
     # Summarize the booted Cenfit means: LCL, UCL, Mean, and Std. Dev
     bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(bootedMeans))
-    bootstrap_Results <- summarize(bootstrap_Results, groupID = groupID[1], boot_LCL = quantile(bootMeans, probs= alpha, na.rm=T), boot_Mean= mean(bootMeans) , boot_UCL= quantile(bootMeans, probs=percentile, na.rm=T), boot_StDev= sd(bootMeans))
+    bootstrap_Results <- summarize(bootstrap_Results, groupID = groupID[1], 
+                                    boot_LCL = quantile(bootMeans, probs= alpha, na.rm=T),
+                                    boot_Mean= mean(bootMeans), 
+                                    boot_UCL= quantile(bootMeans, probs=percentile, na.rm=T),
+                                    boot_StDev= sd(bootMeans))
     bootstrap_Summary <- rbind(bootstrap_Summary, bootstrap_Results)
     
     count <- count + 1

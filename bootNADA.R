@@ -26,7 +26,7 @@ ozone[is.na(ozone$Ozone),"Ozone"]<-0
 #5     0      NA 14.3   56     5   5       TRUE
 #6    28      NA 14.9   66     5   6      FALSE
 
-group_by(ozone, Month) %>% summarize(Ozone_KapM_mean = mean(cenfit(Ozone, Non_detect))[1])
+group_by(ozone, Month) %.% summarize(Ozone_KapM_mean = mean(cenfit(Ozone, Non_detect))[1])
 ##  Month Ozone_KapM_mean
 #1    5      20.0
 #2    6      17.2

@@ -110,7 +110,7 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
 }
 
     # Use Lapply to repeat Cenfit from NADA package and bootstrap the mean of the censured data
-    bootedMeans <- lapply(1:repeats, FUN = getCenMean)
+    bootedMeans <- lapply(1:repeats, FUN = getCenMean, USE.NAMES=F)
     
     # Summarize the booted Cenfit means: LCL, UCL, Mean, and Std. Dev
     bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(bootedMeans, use.names=F))

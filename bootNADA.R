@@ -48,50 +48,55 @@ head(ozone.Booted)
 # The boot_NADA() function takes a censored column containing 0's for detects and 1's for
 # non-detects, or alternatively FALSE for detects and TRUE for non-detects
 bootNADA <- function(data = dataTable, results = "result", censored = "censored", groups = "groupID", repeats = 2000, percentile = 0.95){
-  
-  library(NADA)
-  library(dplyr)
-  
-  # Remove unnecessary columns to speed up repetitions
-  data <- data[,c(results, groups, censored)]
-  
-  # Rename columns
-  names(data) <- c("result", "groupID", "censored")
-  
-  # Set censored column as logical (True/False)
-  data$censored<- as.logical(data$censored)
-  
-  # Drop groups with less than 10% detects
-  drop_Cutoff <- 0.10
-  detect_data <- group_by(data, groupID) %>% summarize(detect_Fraction = length(subset(censored, censored==F))/length(censored) )
-  detect_data <- filter(detect_data, detect_Fraction >= drop_Cutoff)
-  data <- filter(data, groupID %in% detect_data$groupID)
-  
-  # Set NA's and negative result values at 0.0
-  data[is.na(data$result), "result"] <- 0
-  data[data$result < 0, "result"] <- 0
-  
-  # Remove factor from groupID
-  data$groupID <- as.character(data$groupID)
-  
-  # Get alpha from percentile, default is 1 - .95 = 0.05
-  alpha <- (1-percentile)
-  
-  # Start stopwatch
-  start <- proc.time()
-  count <- 0
-  
-  #Count groups for progress counting
-  nGroups <- length(unique(data$groupID))
-      
-  # Suppress repeated warnings
-  options(warn = -1)
-  
-  # Initiate final summary table
-  bootstrap_Summary <- data.frame()
-  
-  # Start bootstrapping one group at a time to limit table size
-  for (group in unique(data$groupID)){
+    
+library(NADA)
+library(dplyr)
+    
+data <- data[,c("Ozone", "Month", "Non_detect")]
+
+# Rename columns
+names(data) <- c("result", "groupID", "censored")
+
+# Set censored column as logical (True/False)
+data$censored<- as.logical(data$censored)
+
+# Drop groups with less than 10% detects
+drop_Cutoff <- 0.10
+detect_data <- group_by(data, groupID) %>% summarize(detect_Fraction = length(subset(censored, censored==F))/length(censored) )
+detect_data <- filter(detect_data, detect_Fraction >= drop_Cutoff)
+data <- filter(data, groupID %in% detect_data$groupID)
+
+# Set NA's and negative result values at 0.0
+data[is.na(data$result), "result"] <- 0
+data[data$result < 0, "result"] <- 0
+
+# Remove factor from groupID
+data$groupID <- as.character(data$groupID)
+
+# Get alpha from percentile, default is 1 - .95 = 0.05
+alpha <- (1-percentile)
+
+# Start stopwatch
+start <- proc.time()
+count <- 0
+
+#Count groups for progress counting
+nGroups <- length(unique(data$groupID))
+
+# Suppress repeated warnings
+options(warn = -1)
+
+# Initiate final summary table
+bootstrap_Summary <- data.frame()
+
+# Define function to record cenfit mean of re-sampled table
+getCenMean <- function(n=n){
+    random.rows <- sample(1:n, replace=T)
+    mean(cenfit(subGroup_table$result[random.rows], subGroup_table$censored[random.rows]))[[1]]
+}
+
+# Start bootstrapping one group at a time to limit table size
+for (group in unique(data$groupID)){
     
     subGroup_table <- filter(data, groupID == group)
     subGroup_table$groupID <- as.character(subGroup_table$groupID)
@@ -103,39 +108,33 @@ bootNADA <- function(data = dataTable, results = "result", censored = "censored"
     # Initiate final summary table
     bootstrap_Results <- data.frame()
     
-    # Define function to record cenfit mean of re-sampled table
-    getCenMean <- function(x){
-          random.rows <- sample(1:n, replace=T)
-          mean(cenfit(subGroup_table$result[random.rows], subGroup_table$censored[random.rows]))[[1]]
-}
-
     # Use Lapply to repeat Cenfit from NADA package and bootstrap the mean of the censured data
-    bootedMeans <- lapply(1:repeats, FUN = getCenMean, USE.NAMES=F)
-    
+    bootedMeans <- lapply(1:repeats, FUN= function(x) getCenMean(n=n))
+
     # Summarize the booted Cenfit means: LCL, UCL, Mean, and Std. Dev
     bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(bootedMeans, use.names=F))
     bootstrap_Results <- summarize(bootstrap_Results, groupID = groupID[1], 
-                                    boot_LCL   = quantile(bootMeans, probs= alpha, na.rm=T),
-                                    boot_Mean  = mean(bootMeans), 
-                                    boot_UCL   = quantile(bootMeans, probs=percentile, na.rm=T),
-                                    boot_StDev = sd(bootMeans))
+                                   boot_LCL   = quantile(bootMeans, probs= alpha, na.rm=T),
+                                   boot_Mean  = mean(bootMeans), 
+                                   boot_UCL   = quantile(bootMeans, probs=percentile, na.rm=T),
+                                   boot_StDev = sd(bootMeans))
     bootstrap_Summary <- rbind(bootstrap_Summary, bootstrap_Results)
     
     count <- count + 1
     cat("\b\b\b\b\b")
-  }
-  
-  # Bring back the original group name
-  names(bootstrap_Summary)[1] <- groups
-  row.names(bootstrap_Summary) <- NULL
-  
-  # Turn warnings back on
-  options(warn=1)
-  
-  # Show time elapsed
-  print(proc.time() - start)
-  cat("\n")
-  
-  print(head(bootstrap_Summary))
-  return(bootstrap_Summary)
+}
+
+# Bring back the original group name
+names(bootstrap_Summary)[1] <- groups
+row.names(bootstrap_Summary) <- NULL
+
+# Turn warnings back on
+options(warn=1)
+
+# Show time elapsed
+print(proc.time() - start)
+cat("\n")
+
+print(head(bootstrap_Summary))
+return(bootstrap_Summary)
 }

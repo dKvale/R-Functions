@@ -34,7 +34,7 @@ group_by(ozone, Month) %>% summarize(Ozone_KapM_mean = mean(cenfit(Ozone, Non_de
 #4    8      51.7
 #5    9      30.6
 
-ozone.Booted <- bootNADA(data=ozone, results="Ozone", censored="Non_detect", groups = "Month", repeats=100)
+ozone.Booted <- bootNADA(data=ozone, results="Ozone", censored="Non_detect", groups="Month", repeats=100)
 head(ozone.Booted)
 ##   Month boot_LCL boot_Mean boot_UCL boot_StDev
 #1     5       14        20       29        4.3
@@ -48,7 +48,7 @@ head(ozone.Booted)
 # The boot_NADA() function takes a censored column containing 0's for detects and 1's for
 # non-detects, or alternatively FALSE for detects and TRUE for non-detects
 
-bootNADA <- function(data = dataTable, results = "result", censored = "censored", groups = "groupID", repeats = 2000, percentile = 0.95){
+bootNADA <- function(data=dataTable, results="result", censored="censored", groups="groupID", repeats=2000, percentile=0.95){
     
 library(NADA)
 library(dplyr)

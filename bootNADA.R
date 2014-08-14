@@ -35,7 +35,6 @@ group_by(ozone, Month) %>% summarize(Ozone_KapM_mean = mean(cenfit(Ozone, Non_de
 #5    9      30.6
 
 ozone.Booted <- bootNADA(data=ozone, results="Ozone", censored="Non_detect", groups="Month", repeats=100)
-head(ozone.Booted)
 ##   Month boot_LCL boot_Mean boot_UCL boot_StDev
 #1     5       14        20       29        4.3
 #2     6       14        18       23        2.8

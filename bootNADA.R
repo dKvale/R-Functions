@@ -47,6 +47,7 @@ head(ozone.Booted)
 
 # The boot_NADA() function takes a censored column containing 0's for detects and 1's for
 # non-detects, or alternatively FALSE for detects and TRUE for non-detects
+
 bootNADA <- function(data = dataTable, results = "result", censored = "censored", groups = "groupID", repeats = 2000, percentile = 0.95){
     
 library(NADA)
@@ -90,7 +91,7 @@ options(warn = -1)
 bootstrap_Summary <- data.frame()
 
 # Define function to record cenfit mean of re-sampled table
-getCenMean <- function(n=n){
+getCenMean <- function(n=nrows){
     random.rows <- sample(1:n, replace=T)
     mean(cenfit(subGroup_table$result[random.rows], subGroup_table$censored[random.rows]))[[1]]
 }
@@ -100,7 +101,7 @@ for (group in unique(data$groupID)){
     
     subGroup_table <- filter(data, groupID == group)
     subGroup_table$groupID <- as.character(subGroup_table$groupID)
-    n <- nrow(subGroup_table)
+    nrows <- nrow(subGroup_table)
     
     # Print % done to screen
     cat(ceiling(count/nGroups*100),"% ", sep="")
@@ -109,7 +110,7 @@ for (group in unique(data$groupID)){
     bootstrap_Results <- data.frame()
     
     # Use Lapply to repeat Cenfit from NADA package and bootstrap the mean of the censured data
-    bootedMeans <- lapply(1:repeats, FUN= function(x) getCenMean(n=n))
+    bootedMeans <- lapply(1:repeats, FUN= function(x) getCenMean(n=nrows))
 
     # Summarize the booted Cenfit means: LCL, UCL, Mean, and Std. Dev
     bootstrap_Results <- data.frame(groupID = group, bootMeans=unlist(bootedMeans, use.names=F))

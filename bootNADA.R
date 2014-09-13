@@ -52,7 +52,7 @@ bootNADA <- function(data=dataTable, results="result", censored="censored", grou
 library(NADA)
 library(dplyr)
     
-data <- data[,c("Ozone", "Month", "Non_detect")]
+data <- data[,c(results, groups, censored)]
 
 # Rename columns
 names(data) <- c("result", "groupID", "censored")

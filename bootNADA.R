@@ -66,9 +66,8 @@ detect_data <- group_by(data, groupID) %>% summarize(detect_Fraction = length(su
 detect_data <- filter(detect_data, detect_Fraction >= drop_Cutoff)
 data <- filter(data, groupID %in% detect_data$groupID)
 
-# Set NA's and negative result values at 0.0
-data[is.na(data$result), "result"] <- 0
-data[data$result < 0, "result"] <- 0
+# Set NA's to zero if appropriate
+#data[is.na(data$result), "result"] <- 0
 
 # Remove factor from groupID
 data$groupID <- as.character(data$groupID)

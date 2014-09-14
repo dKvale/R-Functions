@@ -90,7 +90,7 @@ bootNADA <- function(data=dataTable, results="result", censored="censored", grou
     nrows <- nrow(subGroup_table)
     
     # Print % done to screen
-    cat(strtrim(paste0(ceiling(count/nGroups*100), "  "), 2),"% ", sep="")
+    cat(strtrim(paste0(ceiling(count/nGroups*100), "  "), 3),"% ", sep="")
     
     # Initiate final summary table
     bootstrap_Results <- data.frame()
@@ -107,7 +107,7 @@ bootNADA <- function(data=dataTable, results="result", censored="censored", grou
                                    boot_StDev = sd(bootMeans))
     bootstrap_Summary <- rbind(bootstrap_Summary, bootstrap_Results)
     count <- count + 1
-    cat("\b\b\b\b")
+    cat("\b\b\b\b\b")
   }
   # Bring back the original group name
   names(bootstrap_Summary)[1] <- groups
@@ -115,6 +115,7 @@ bootNADA <- function(data=dataTable, results="result", censored="censored", grou
   # Turn warnings back on
   options(warn=1)
   # Show time elapsed
+  cat("\n")
   print(proc.time() - start)
   cat("\n")
   print(head(bootstrap_Summary))
